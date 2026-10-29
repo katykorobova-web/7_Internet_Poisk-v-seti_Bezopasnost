@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интернет. Поиск информации в сети Интернет</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8f9fa;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius: 14px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px;
+            text-align: center;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-hover);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--border);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .option {
+            display: block;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px;
+        }
+
+        .option:hover {
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+
+        .option.selected {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            min-height: 44px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .feedback {
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-top: 16px;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .feedback.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .matching-item {
+            padding: 16px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px;
+        }
+
+        .matching-item:hover {
+            border-color: var(--accent);
+        }
+
+        .matching-item.selected {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .matching-item.matched {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+            cursor: default;
+        }
+
+        .fill-blank {
+            display: inline-block;
+            min-width: 120px;
+            padding: 4px 12px;
+            margin: 0 4px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            font-family: inherit;
+            font-size: 1rem;
+            text-align: center;
+            min-height: 32px;
+        }
+
+        .fill-blank:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Конструктор адреса */
+        .constructor-area {
+            background: var(--bg);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            min-height: 80px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .constructor-area.has-items {
+            border-style: solid;
+            border-color: var(--accent);
+        }
+
+        .constructor-placeholder {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .constructor-block {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: white;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .constructor-block:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .constructor-block .remove-mark {
+            margin-left: 8px;
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .fragments-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .fragment {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 16px;
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            min-height: 44px;
+        }
+
+        .fragment:hover:not(.used) {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .fragment.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .constructor-hint {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .constructor-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            min-height: 36px;
+            border-radius: 10px;
+        }
+
+        .theory-section {
+            background: var(--surface);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: var(--radius);
+        }
+
+        .theory-section h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .theory-section ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .theory-section li {
+            margin-bottom: 8px;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 20px 0;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .navigation .btn {
+            flex: 1;
+        }
+
+        @media (max-width: 640px) {
+            #app {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .matching-container {
+                grid-template-columns: 1fr;
+            }
+
+            .fragment, .constructor-block {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // Constants
+        const TOTAL_QUESTIONS = 12;
+
+        // State
+        let state = {
+            currentScreen: 'start',
+            currentQuestion: 0,
+            answers: {},
+            score: 0,
+            checked: {}, // был ли уже проверен вопрос
+            matchingState: {
+                selectedLeft: null,
+                selectedRight: null,
+                matches: []
+            },
+            constructorOrder: [] // порядок выбранных фрагментов (индексы)
+        };
+
+        // Questions data
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Что такое интернет?',
+                options: [
+                    'Только социальные сети',
+                    'Всемирная компьютерная сеть',
+                    'Программа для работы с документами',
+                    'Игровая приставка'
+                ],
+                correct: 1,
+                explanation: 'Интернет — это всемирная компьютерная сеть, состоящая из устройств, соединённых проводным или беспроводным способом.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Какие устройства называются клиентами в интернете?',
+                options: [
+                    'Устройства для раздачи информации',
+                    'Устройства, на которых пользователи потребляют информацию',
+                    'Только серверы',
+                    'Только роутеры'
+                ],
+                correct: 1,
+                explanation: 'Клиенты — это устройства, на которых пользователи потребляют информацию. Обычно у клиентов есть клавиатура и экран.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Какой способ передачи данных считается самым быстрым и надёжным?',
+                options: [
+                    'DSL',
+                    'Коаксиальный',
+                    'Оптоволоконный',
+                    'Спутниковый'
+                ],
+                correct: 2,
+                explanation: 'Оптоволоконный способ передачи данных считается самым быстрым и надёжным. Данные передаются за счёт света и прозрачного пластика/стекла.'
+            },
+            {
+                type: 'fill-blank',
+                question: 'Заполни пропуски в тексте:',
+                text: 'У каждого устройства, подключённого к интернету, есть ___ — свой уникальный адрес в сети. Он похож на ___ адрес дома.',
+                blanks: ['IP-адрес', 'почтовый'],
+                explanation: 'IP-адрес — это уникальный адрес устройства в сети, который действует как адрес доставки информации.'
+            },
+            {
+                type: 'matching',
+                question: 'Сопоставь виды связи с их описанием:',
+                left: ['DSL', 'Коаксиальный', 'Оптоволоконный', 'Спутниковый'],
+                right: [
+                    'Медные линии для передачи данных',
+                    'Медная жила и экранированная конструкция',
+                    'Свет и прозрачное стекло',
+                    'Сигнал от спутников'
+                ],
+                correct: [0, 1, 2, 3],
+                explanation: 'DSL использует медные линии, коаксиальный — медную жилу с экранированием, оптоволоконный — свет и стекло, спутниковый — сигнал от спутников.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Что такое доменное имя?',
+                options: [
+                    'IP-адрес сервера',
+                    'Символьное имя сервера, на котором хранится сайт',
+                    'Название браузера',
+                    'Тип интернет-соединения'
+                ],
+                correct: 1,
+                explanation: 'Доменное имя — это символьное имя сервера, на котором хранится сайт. Оно состоит из нескольких уровней, разделённых точками.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Какие программы помогают путешествовать по Всемирной паутине?',
+                options: [
+                    'Текстовые редакторы',
+                    'Браузеры',
+                    'Калькуляторы',
+                    'Антивирусы'
+                ],
+                correct: 1,
+                explanation: 'Браузеры — это программы, которые помогают нам путешествовать по Всемирной паутине. Примеры: Chrome, Яндекс, Firefox.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Что такое поисковая система?',
+                options: [
+                    'Программа для создания документов',
+                    'Сайт, генерирующий поисковый запрос и выдающий список найденных страниц',
+                    'Тип интернет-соединения',
+                    'Антивирусная программа'
+                ],
+                correct: 1,
+                explanation: 'Поисковая система — это сайт, генерирующий заданный пользователем поисковый запрос и выдающий список найденных страниц.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Какой тип поиска выдаёт список страниц, содержащих хотя бы одно из ключевых слов?',
+                options: [
+                    'Поиск по всем словам',
+                    'Поиск точно по фразе',
+                    'Поиск по любому из слов',
+                    'Расширенный поиск'
+                ],
+                correct: 2,
+                explanation: 'Поиск по любому из слов — результатом является список всех страниц, содержащих хотя бы одно из ключевых слов.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Какое правило НЕ относится к сетевому этикету?',
+                options: [
+                    'Вежливость без оскорблений',
+                    'Использование CAPS LOCK для выделения важного',
+                    'Грамотное оформление сообщений',
+                    'Конфиденциальность личных данных'
+                ],
+                correct: 1,
+                explanation: 'Использование CAPS LOCK не относится к сетевому этикету. Правила включают вежливость, грамотность и конфиденциальность.'
+            },
+            {
+                type: 'constructor',
+                question: 'Задача из ВПР. Доступ к файлу water.txt, находящемуся на сервере river.kz, осуществляется по протоколу https. Собери адрес файла, нажимая на фрагменты в правильном порядке:',
+                fragments: ['water.', '://', 'txt', '.kz', 'https', 'river', '/'],
+                // правильный порядок: https :// river .kz / water. txt
+                correctOrder: [4, 1, 5, 3, 6, 0, 2]
+            },
+            {
+                type: 'constructor',
+                question: 'Задача из ВПР. Доступ к файлу pas.cpp, находящемуся на сервере com.edu, осуществляется по протоколу ftp. Собери адрес файла, нажимая на фрагменты в правильном порядке:',
+                fragments: ['com', '.edu', 'pas', '.cpp', '/', '://', 'ftp'],
+                // правильный порядок: ftp :// com .edu / pas .cpp
+                correctOrder: [6, 5, 0, 1, 4, 2, 3]
+            }
+        ];
+
+        // Проверка: заполнен ли текущий вопрос
+        function isCurrentQuestionAnswered() {
+            const q = questions[state.currentQuestion];
+            const answer = state.answers[state.currentQuestion];
+
+            if (q.type === 'multiple-choice') {
+                return answer !== undefined;
+            }
+            if (q.type === 'fill-blank') {
+                if (!Array.isArray(answer)) return false;
+                return q.blanks.every((_, i) => answer[i] && answer[i].trim() !== '');
+            }
+            if (q.type === 'matching') {
+                return state.matchingState.matches.length === q.left.length;
+            }
+            if (q.type === 'constructor') {
+                return state.constructorOrder.length === q.fragments.length;
+            }
+            return false;
+        }
+
+        // Обновить только состояние кнопки "Далее" без полного ререндера
+        function updateNextButton() {
+            const btn = document.getElementById('nextBtn');
+            if (btn) {
+                btn.disabled = !isCurrentQuestionAnswered();
+            }
+        }
+
+        // Render
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = '';
+
+            switch(state.currentScreen) {
+                case 'start':
+                    renderStartScreen();
+                    break;
+                case 'theory':
+                    renderTheoryScreen();
+                    break;
+                case 'quiz':
+                    renderQuizScreen();
+                    break;
+                case 'results':
+                    renderResultsScreen();
+                    break;
+            }
+        }
+
+        function renderStartScreen() {
+            const app = document.getElementById('app');
+            const screen = document.createElement('div');
+            screen.className = 'screen active';
+            screen.innerHTML = `
+                <div class="card">
+                    <h1>Интернет. Поиск информации в сети Интернет</h1>
+                    <p class="question-text">Интерактивный рабочий лист по информатике для 7 класса</p>
+                    <div class="theory-section">
+                        <h3>Что тебя ждёт:</h3>
+                        <ul>
+                            <li>Повторение теории об интернете</li>
+                            <li>Изучение поисковых систем и браузеров</li>
+                            <li>Правила безопасности в сети</li>
+                            <li>12 заданий разного типа</li>
+                            <li>Практические задачи из ВПР</li>
+                        </ul>
+                    </div>
+                    <button class="btn" onclick="startQuiz()" style="width: 100%;">Начать</button>
+                </div>
+            `;
+            app.appendChild(screen);
+        }
+
+        function renderTheoryScreen() {
+            const app = document.getElementById('app');
+            const screen = document.createElement('div');
+            screen.className = 'screen active';
+            screen.innerHTML = `
+                <div class="card">
+                    <h2>Повторение теории</h2>
+                    
+                    <div class="theory-section">
+                        <h3>Интернет</h3>
+                        <p>Интернет — это всемирная компьютерная сеть, которая состоит из устройств, соединённых проводным (кабели) или беспроводным способом (спутниковая связь, Wi-Fi).</p>
+                        <p><strong>Клиенты</strong> — устройства, на которых пользователи потребляют информацию (телефон, планшет, ноутбук).</p>
+                        <p><strong>Серверы</strong> — компьютеры для раздачи информации клиентам. Хранят данные и организуют работу других компьютеров.</p>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>Виды связи в интернете</h3>
+                        <p><strong>Проводные:</strong></p>
+                        <ul>
+                            <li>DSL — медные линии</li>
+                            <li>Коаксиальный — медная жила с экранированием</li>
+                            <li>Оптоволоконный — свет и стекло (самый быстрый)</li>
+                        </ul>
+                        <p><strong>Беспроводные:</strong></p>
+                        <ul>
+                            <li>Стационарный — беспроводные вышки</li>
+                            <li>Спутниковый — сигнал от спутников</li>
+                        </ul>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>IP-адреса и домены</h3>
+                        <p><strong>IP-адрес</strong> — уникальный адрес устройства в сети, похож на почтовый адрес.</p>
+                        <p><strong>Доменное имя</strong> — символьное имя сервера. Состоит из уровней, разделённых точками.</p>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>Поисковые системы</h3>
+                        <p><strong>Браузеры</strong> — программы для работы с интернетом (Chrome, Яндекс, Firefox).</p>
+                        <p><strong>Поисковая система</strong> — сайт для поиска информации (Яндекс, Google).</p>
+                        <p><strong>Типы поиска:</strong></p>
+                        <ul>
+                            <li>По любому из слов</li>
+                            <li>По всем словам</li>
+                            <li>Точно по фразе</li>
+                        </ul>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>Безопасность в сети</h3>
+                        <ul>
+                            <li>Не переходить по подозрительным ссылкам</li>
+                            <li>Не выдавать личные данные</li>
+                            <li>Использовать сложные пароли</li>
+                            <li>Проверять достоверность информации</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn" onclick="startQuestions()" style="width: 100%; margin-top: 20px;">Перейти к заданиям</button>
+                </div>
+            `;
+            app.appendChild(screen);
+        }
+
+        function renderQuizScreen() {
+            const app = document.getElementById('app');
+            const screen = document.createElement('div');
+            screen.className = 'screen active';
+            
+            const question = questions[state.currentQuestion];
+            const progress = ((state.currentQuestion + 1) / TOTAL_QUESTIONS) * 100;
+            
+            let questionHTML = `
+                <div class="card">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 8px;">Вопрос ${state.currentQuestion + 1} из ${TOTAL_QUESTIONS}</p>
+                    <h3 class="question-text">${escapeHtml(question.question)}</h3>
+            `;
+
+            if (question.type === 'multiple-choice') {
+                questionHTML += renderMultipleChoice(question);
+            } else if (question.type === 'fill-blank') {
+                questionHTML += renderFillBlank(question);
+            } else if (question.type === 'matching') {
+                questionHTML += renderMatching(question);
+            } else if (question.type === 'constructor') {
+                questionHTML += renderConstructor(question);
+            }
+
+            const nextBtnDisabled = !isCurrentQuestionAnswered();
+            const nextLabel = state.currentQuestion === TOTAL_QUESTIONS - 1 ? 'Завершить' : 'Далее';
+
+            questionHTML += `
+                    <div id="feedback"></div>
+                    <div class="navigation">
+                        ${state.currentQuestion > 0 ? '<button class="btn btn-secondary" onclick="previousQuestion()">Назад</button>' : ''}
+                        <button class="btn" id="nextBtn" onclick="nextQuestion()" ${nextBtnDisabled ? 'disabled' : ''}>
+                            ${nextLabel}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            screen.innerHTML = questionHTML;
+            app.appendChild(screen);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function renderMultipleChoice(question) {
+            let html = '';
+            question.options.forEach((option, index) => {
+                const isSelected = state.answers[state.currentQuestion] === index;
+                html += `
+                    <div class="option ${isSelected ? 'selected' : ''}" 
+                         onclick="selectOption(${index})" 
+                         role="button" 
+                         tabindex="0"
+                         onkeypress="if(event.key==='Enter')selectOption(${index})">
+                        ${escapeHtml(option)}
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function renderFillBlank(question) {
+            if (!Array.isArray(state.answers[state.currentQuestion])) {
+                state.answers[state.currentQuestion] = question.blanks.map(() => '');
+            }
+            const values = state.answers[state.currentQuestion];
+            let parts = question.text.split('___');
+            let html = '<p class="question-text">';
+            parts.forEach((part, i) => {
+                html += escapeHtml(part);
+                if (i < parts.length - 1) {
+                    html += `<input type="text" class="fill-blank" data-blank-index="${i}" value="${escapeHtml(values[i] || '')}" oninput="handleFillBlankInput(this)" placeholder="...">`;
+                }
+            });
+            html += '</p>';
+            return html;
+        }
+
+        function renderMatching(question) {
+            const { matchingState } = state;
+            let html = '<div class="matching-container">';
+            
+            html += '<div>';
+            question.left.forEach((item, index) => {
+                const isMatched = matchingState.matches.some(m => m.left === index);
+                const isSelected = matchingState.selectedLeft === index;
+                html += `
+                    <div class="matching-item ${isMatched ? 'matched' : ''} ${isSelected ? 'selected' : ''}" 
+                         onclick="selectMatchingLeft(${index})"
+                         role="button"
+                         tabindex="0"
+                         onkeypress="if(event.key==='Enter')selectMatchingLeft(${index})">
+                        ${escapeHtml(item)}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            html += '<div>';
+            question.right.forEach((item, index) => {
+                const isMatched = matchingState.matches.some(m => m.right === index);
+                const isSelected = matchingState.selectedRight === index;
+                html += `
+                    <div class="matching-item ${isMatched ? 'matched' : ''} ${isSelected ? 'selected' : ''}" 
+                         onclick="selectMatchingRight(${index})"
+                         role="button"
+                         tabindex="0"
+                         onkeypress="if(event.key==='Enter')selectMatchingRight(${index})">
+                        ${escapeHtml(item)}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Конструктор адреса
+        function renderConstructor(question) {
+            const order = state.constructorOrder;
+            const allUsed = order.length === question.fragments.length;
+
+            let html = '<p class="constructor-hint">Нажимай на фрагменты в нужном порядке. Клик по блоку в ответе — убрать его.</p>';
+
+            // Область собранного ответа
+            html += '<div class="constructor-area' + (order.length > 0 ? ' has-items' : '') + '">';
+            if (order.length === 0) {
+                html += '<div class="constructor-placeholder">Собери адрес здесь…</div>';
+            } else {
+                order.forEach((fragIdx, pos) => {
+                    html += `<div class="constructor-block" onclick="removeConstructorBlock(${pos})" title="Нажми, чтобы убрать">
+                        ${escapeHtml(question.fragments[fragIdx])}
+                        <span class="remove-mark">✕</span>
+                    </div>`;
+                });
+            }
+            html += '</div>';
+
+            // Кнопка сброса
+            if (order.length > 0) {
+                html += `<div class="constructor-actions">
+                    <button type="button" class="btn btn-secondary btn-small" onclick="resetConstructor()">Очистить</button>
+                </div>`;
+            }
+
+            // Пул фрагментов
+            html += '<div class="fragments-pool">';
+            question.fragments.forEach((frag, idx) => {
+                const isUsed = order.includes(idx);
+                html += `<div class="fragment ${isUsed ? 'used' : ''}" 
+                             onclick="${isUsed ? '' : 'addConstructorBlock(' + idx + ')'}"
+                             role="button"
+                             tabindex="0"
+                             onkeypress="if(event.key==='Enter' && !${isUsed})addConstructorBlock(${idx})">
+                    ${escapeHtml(frag)}
+                </div>`;
+            });
+            html += '</div>';
+
+            return html;
+        }
+
+        function renderResultsScreen() {
+            const app = document.getElementById('app');
+            const screen = document.createElement('div');
+            screen.className = 'screen active';
+            
+            const percentage = Math.round((state.score / TOTAL_QUESTIONS) * 100);
+            let message = '';
+            if (percentage >= 90) message = 'Отлично! Ты прекрасно разбираешься в теме!';
+            else if (percentage >= 70) message = 'Хорошо! Ты хорошо усвоил материал.';
+            else if (percentage >= 50) message = 'Неплохо, но есть что повторить.';
+            else message = 'Рекомендуется повторить теорию.';
+
+            screen.innerHTML = `
+                <div class="card">
+                    <div class="score-display">
+                        <h2>Результаты</h2>
+                        <div class="score-number">${state.score}/${TOTAL_QUESTIONS}</div>
+                        <div class="score-text">${percentage}% правильных ответов</div>
+                        <p class="question-text">${message}</p>
+                        <button class="btn" onclick="restartQuiz()" style="width: 100%; margin-top: 20px;">Пройти ещё раз</button>
+                    </div>
+                </div>
+            `;
+            app.appendChild(screen);
+        }
+
+        // Handlers
+        function startQuiz() {
+            state.currentScreen = 'theory';
+            render();
+        }
+
+        function startQuestions() {
+            state.currentScreen = 'quiz';
+            state.currentQuestion = 0;
+            render();
+        }
+
+        function selectOption(index) {
+            state.answers[state.currentQuestion] = index;
+            checkAnswer();
+            render();
+        }
+
+        function handleFillBlankInput(el) {
+            const idx = parseInt(el.getAttribute('data-blank-index'), 10);
+            const qIdx = state.currentQuestion;
+            if (!Array.isArray(state.answers[qIdx])) {
+                state.answers[qIdx] = questions[qIdx].blanks.map(() => '');
+            }
+            state.answers[qIdx][idx] = el.value;
+
+            const allFilled = questions[qIdx].blanks.every((_, i) => 
+                state.answers[qIdx][i] && state.answers[qIdx][i].trim() !== ''
+            );
+            if (allFilled && !state.checked[qIdx]) {
+                checkFillBlankAnswer();
+            }
+            updateNextButton();
+        }
+
+        function selectMatchingLeft(index) {
+            const { matchingState } = state;
+            if (matchingState.matches.some(m => m.left === index)) return;
+            
+            matchingState.selectedLeft = index;
+            tryMatch();
+        }
+
+        function selectMatchingRight(index) {
+            const { matchingState } = state;
+            if (matchingState.matches.some(m => m.right === index)) return;
+            
+            matchingState.selectedRight = index;
+            tryMatch();
+        }
+
+        function tryMatch() {
+            const { matchingState } = state;
+            if (matchingState.selectedLeft !== null && matchingState.selectedRight !== null) {
+                matchingState.matches.push({
+                    left: matchingState.selectedLeft,
+                    right: matchingState.selectedRight
+                });
+                matchingState.selectedLeft = null;
+                matchingState.selectedRight = null;
+                
+                const question = questions[state.currentQuestion];
+                if (matchingState.matches.length === question.left.length && !state.checked[state.currentQuestion]) {
+                    checkMatchingAnswer();
+                }
+                render();
+            }
+        }
+
+        // Обработчики конструктора
+        function addConstructorBlock(fragIdx) {
+            const qIdx = state.currentQuestion;
+            const question = questions[qIdx];
+            if (state.constructorOrder.includes(fragIdx)) return;
+            if (state.constructorOrder.length >= question.fragments.length) return;
+
+            state.constructorOrder.push(fragIdx);
+
+            // Когда все фрагменты использованы — проверяем
+            if (state.constructorOrder.length === question.fragments.length && !state.checked[qIdx]) {
+                checkConstructorAnswer();
+            }
+            render();
+        }
+
+        function removeConstructorBlock(pos) {
+            const qIdx = state.currentQuestion;
+            // Если уже проверено — не даём менять
+            if (state.checked[qIdx]) return;
+            state.constructorOrder.splice(pos, 1);
+            render();
+        }
+
+        function resetConstructor() {
+            const qIdx = state.currentQuestion;
+            if (state.checked[qIdx]) return;
+            state.constructorOrder = [];
+            render();
+        }
+
+        function checkConstructorAnswer() {
+            const qIdx = state.currentQuestion;
+            if (state.checked[qIdx]) return;
+            const question = questions[qIdx];
+            const order = state.constructorOrder;
+            const isCorrect = order.length === question.correctOrder.length &&
+                order.every((val, i) => val === question.correctOrder[i]);
+            state.checked[qIdx] = true;
+            showConstructorFeedback(isCorrect);
+            if (isCorrect) state.score++;
+        }
+
+        function showConstructorFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            if (feedback) {
+                const div = document.createElement('div');
+                div.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                div.textContent = isCorrect ? '✓ Верно!' : '✗ Неверно.';
+                feedback.appendChild(div);
+            }
+        }
+
+        function checkAnswer() {
+            const qIdx = state.currentQuestion;
+            if (state.checked[qIdx]) return;
+            const question = questions[qIdx];
+            const userAnswer = state.answers[qIdx];
+            const isCorrect = userAnswer === question.correct;
+            state.checked[qIdx] = true;
+            showFeedback(isCorrect, question.explanation);
+            if (isCorrect) state.score++;
+        }
+
+        function checkFillBlankAnswer() {
+            const qIdx = state.currentQuestion;
+            if (state.checked[qIdx]) return;
+            const question = questions[qIdx];
+            const userAnswers = state.answers[qIdx];
+            const isCorrect = question.blanks.every((blank, i) => 
+                userAnswers[i].toLowerCase().trim() === blank.toLowerCase().trim()
+            );
+            state.checked[qIdx] = true;
+            showFeedback(isCorrect, question.explanation);
+            if (isCorrect) state.score++;
+        }
+
+        function checkMatchingAnswer() {
+            const qIdx = state.currentQuestion;
+            if (state.checked[qIdx]) return;
+            const question = questions[qIdx];
+            const { matchingState } = state;
+            const isCorrect = matchingState.matches.every((match) => 
+                match.left === match.right
+            );
+            state.checked[qIdx] = true;
+            showFeedback(isCorrect, question.explanation);
+            if (isCorrect) state.score++;
+        }
+
+        function showFeedback(isCorrect, explanation) {
+            const feedback = document.getElementById('feedback');
+            if (feedback) {
+                const div = document.createElement('div');
+                div.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+                div.textContent = (isCorrect ? '✓ Верно! ' : '✗ Неверно. ') + explanation;
+                feedback.appendChild(div);
+            }
+        }
+
+        function nextQuestion() {
+            if (!isCurrentQuestionAnswered()) return;
+            if (state.currentQuestion < TOTAL_QUESTIONS - 1) {
+                state.currentQuestion++;
+                state.matchingState = { selectedLeft: null, selectedRight: null, matches: [] };
+                state.constructorOrder = [];
+                render();
+            } else {
+                state.currentScreen = 'results';
+                render();
+            }
+        }
+
+        function previousQuestion() {
+            if (state.currentQuestion > 0) {
+                state.currentQuestion--;
+                state.matchingState = { selectedLeft: null, selectedRight: null, matches: [] };
+                state.constructorOrder = [];
+                render();
+            }
+        }
+
+        function restartQuiz() {
+            state = {
+                currentScreen: 'start',
+                currentQuestion: 0,
+                answers: {},
+                score: 0,
+                checked: {},
+                matchingState: {
+                    selectedLeft: null,
+                    selectedRight: null,
+                    matches: []
+                },
+                constructorOrder: []
+            };
+            render();
+        }
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>
